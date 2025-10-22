@@ -1,4 +1,4 @@
-# 🌿 AsalUsul for Cultural Heritage
+# 🌿 AsalUsul for Cultural Heritage by Zega Brothers
 
 ![Status](https://img.shields.io/badge/status-prototype-green)
 ![HTML5](https://img.shields.io/badge/HTML5-orange?logo=html5)
