@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- PERUBAHAN: Judul diubah -->
+    <title>AsalUsul for Cultural Heritage - Prototipe Aplikasi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- TAMBAHAN: Library Chart.js untuk grafik -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(120deg, #f0fdf4, #e0f2fe);
+        }
+        .brand-green {
+            color: #22c55e;
+        }
+        .brand-green-bg {
+            background-color: #22c55e;
+        }
+        .step-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .step-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 50%;
+            left: -0.625rem;
+            top: 0;
+            background-color: white;
+            border: 4px solid #4ade80; /* green-400 */
+        }
+        .page-container {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .file-input-label {
+            border: 2px dashed #cbd5e1;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 0.75rem;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .file-input-label:hover {
+            background-color: #f1f5f9;
+            border-color: #94a3b8;
+        }
+        /* Style untuk scanner simulasi */
+        .scanner-view {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            background: #333;
+            border-radius: 1rem;
+            overflow: hidden;
+            margin: 1.5rem auto;
+            border: 4px solid #555;
+        }
+        .scanner-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #22c55e, transparent);
+            box-shadow: 0 0 10px #22c55e;
+            animation: scan 3s linear infinite;
+        }
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 99%; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <!-- ======================= -->
+    <!--   LANDING PAGE (UMUM)   -->
+    <!-- ======================= -->
+    <div id="landing-page-container" class="page-container">
+        <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200">
+            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <!-- PERUBAHAN: Nama Aplikasi diubah -->
+                <h1 class="text-2xl font-bold text-slate-900">Asal<span class="brand-green">Usul</span></h1>
+                <nav class="hidden md:flex space-x-8 items-center">
+                    <a href="#cara-kerja" class="text-slate-600 hover:text-slate-900">Cara Kerja</a>
+                    <a href="#contoh-paspor" class="text-slate-600 hover:text-slate-900">Contoh Paspor</a>
+                    <a href="#teknologi" class="text-slate-600 hover:text-slate-900">Teknologi</a>
+                    <a href="#" onclick="showPage('logistics-scan-page')" class="text-blue-600 hover:text-blue-800 font-semibold">Pindai Logistik</a>
+                    <a href="#" onclick="showPage('consumer-scan-page')" class="text-green-600 hover:text-green-800 font-semibold">Pindai Konsumen</a>
+                </nav>
+                <div class="hidden md:flex items-center">
+                    <button onclick="showPage('login-page')" class="bg-slate-900 text-white font-semibold px-5 py-2 rounded-lg hover:bg-slate-700 transition-colors">Masuk sebagai Kreator</button>
+                    <button onclick="showPage('consumer-login-page')" class="ml-4 brand-green-bg text-white font-semibold px-5 py-2 rounded-lg hover:bg-green-700 transition-colors">Masuk sebagai Konsumen</button>
+                </div>
+                <button class="md:hidden text-slate-900">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+            </div>
+        </header>
+        <main>
+            <section class="gradient-bg py-20 md:py-32">
+                <div class="container mx-auto px-6 text-center">
+                    <h2 class="text-4xl md:text-6xl font-bold text-slate-900 leading-tight mb-4">Paspor Digital Produk dengan Satu Pindai</h2>
+                    <!-- PERUBAHAN: Slogan diubah -->
+                    <p class="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto mb-8">Setiap Karya Punya Cerita. Setiap Cerita Punya Nilai.</p>
+                    <button onclick="showPage('login-page')" class="bg-slate-900 text-white font-semibold px-8 py-4 rounded-lg hover:bg-slate-700 transition-colors inline-block text-lg">Daftarkan Produk Anda Sekarang</button>
+                </div>
+            </section>
+            <!-- Sections: Cara Kerja, Contoh Paspor, Teknologi, CTA -->
+             <section id="cara-kerja" class="py-20 md:py-24 bg-white">
+                <div class="container mx-auto px-6">
+                    <div class="text-center mb-16">
+                        <h3 class="text-3xl md:text-4xl font-bold text-slate-900">Tiga Langkah Mudah Menuju Transparansi</h3>
+                        <p class="text-lg text-slate-600 mt-3">Sebuah alur sederhana dari studio Anda hingga ke tangan konsumen.</p>
+                    </div>
+                    <div class="grid md:grid-cols-3 gap-8 md:gap-12">
+                        <div class="step-card bg-slate-50 p-8 rounded-2xl border border-slate-200">
+                            <div class="brand-green-bg w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            </div>
+                            <h4 class="text-2xl font-bold mb-3">1. Daftarkan & Cetak</h4>
+                            <p class="text-slate-600">Kreator mengisi form dalam 2 menit. Kami membuatkan Segel Digital (QR Code) dan NFT unik secara otomatis di latar belakang.</p>
+                        </div>
+                        <div class="step-card bg-slate-50 p-8 rounded-2xl border border-slate-200">
+                             <div class="brand-green-bg w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            </div>
+                            <h4 class="text-2xl font-bold mb-3">2. Pindai & Lacak</h4>
+                            <p class="text-slate-600">Pihak logistik memindai segel di setiap titik untuk mencatat perjalanan produk secara transparan di blockchain.</p>
+                        </div>
+                        <div class="step-card bg-slate-50 p-8 rounded-2xl border border-slate-200">
+                            <div class="brand-green-bg w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            </div>
+                            <h4 class="text-2xl font-bold mb-3">3. Verifikasi & Nikmati</h4>
+                            <p class="text-slate-600">Konsumen memindai segel dengan ponsel dan langsung melihat Paspor Digital, cerita, dan keaslian produk.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="contoh-paspor" class="py-20 md:py-24 gradient-bg">
+                <div class="container mx-auto px-6">
+                    <div class="text-center mb-16">
+                        <h3 class="text-3xl md:text-4xl font-bold text-slate-900">Momen Paling Penting: Paspor Digital</h3>
+                        <p class="text-lg text-slate-600 mt-3">Ini yang akan dilihat konsumen Anda. Sebuah pengalaman premium, bukan sekadar halaman web biasa.</p>
+                    </div>
+                    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden md:flex">
+                        <div class="md:w-1/2">
+                            <img src="https://placehold.co/800x1000/111827/FFF?text=Sepatu\nNusantara" alt="Sepatu edisi terbatas" class="h-full w-full object-cover">
+                        </div>
+                        <div class="p-8 md:p-10 md:w-1/2 flex flex-col">
+                            <div class="bg-green-100 text-green-800 text-base font-bold px-4 py-2 rounded-full inline-block self-start mb-4">
+                                ✅ PRODUK ASLI TERVERIFIKASI
+                            </div>
+                            <h4 class="text-3xl font-bold text-slate-900">Sepatu "Nusantara"</h4>
+                            <p class="text-slate-500 mb-6">Edisi Terbatas (1 dari 50)</p>
+                            <div class="mb-6">
+                                <h5 class="font-semibold mb-2 text-slate-700">Cerita di Balik Produk</h5>
+                                <p class="text-slate-600 text-sm">Dibuat tangan oleh Bp. Adi Santoso dari Studio Kaki Langit, sepatu ini terinspirasi dari kekayaan corak batik Indonesia, menggunakan kulit sapi lokal premium yang diproses secara etis.</p>
+                            </div>
+                            <div>
+                                 <h5 class="font-semibold mb-4 text-slate-700">Peta Perjalanan Produk</h5>
+                                 <!-- KONTEN TIMELINE SEKARANG DINAMIS -->
+                                 <div id="journey-timeline" class="relative pl-5 border-l-2 border-slate-200">
+                                    <!-- Data perjalanan akan dirender oleh JavaScript di sini -->
+                                    <div class="text-center p-4 text-slate-500">
+                                        Memuat data perjalanan...
+                                    </div>
+                                 </div>
+                            </div>
+                            <!-- PERUBAHAN: Nama Aplikasi diubah -->
+                            <div class="mt-auto pt-6 text-center text-xs text-slate-400">
+                                Didukung oleh AsalUsul
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="teknologi" class="py-20 md:py-24 bg-white">
+                <div class="container mx-auto px-6">
+                    <div class="text-center mb-16">
+                        <h3 class="text-3xl md:text-4xl font-bold text-slate-900">Dibangun di Atas Teknologi Masa Depan</h3>
+                        <p class="text-lg text-slate-600 mt-3">Kami menyederhanakan Web3 agar Anda bisa fokus pada karya Anda.</p>
+                    </div>
+                    <div class="max-w-5xl mx-auto grid md:grid-cols-3 gap-8 text-center">
+                        <div class="p-6"><img src="https://placehold.co/80x80/e0f2fe/0c4a6e?text=Polygon" class="mx-auto rounded-full mb-4" alt="Polygon Logo"><h4 class="text-xl font-bold mb-2">Blockchain Cepat & Murah</h4><p class="text-slate-600">Menggunakan Polygon untuk transaksi instan dengan biaya yang hampir nol, memastikan riwayat produk tercatat efisien.</p></div>
+                        <div class="p-6"><img src="https://placehold.co/80x80/dcfce7/14532d?text=IPFS" class="mx-auto rounded-full mb-4" alt="IPFS Logo"><h4 class="text-xl font-bold mb-2">Penyimpanan Terdesentralisasi</h4><p class="text-slate-600">Foto dan video cerita produk disimpan di IPFS, menjadikannya abadi dan tahan sensor.</p></div>
+                        <div class="p-6"><img src="https://placehold.co/80x80/f1f5f9/1e293b?text=Wallet" class="mx-auto rounded-full mb-4" alt="Wallet Icon"><h4 class="text-xl font-bold mb-2">Login Super Mudah</h4><p class="text-slate-600">Tidak perlu pusing dengan *seed phrase*. Pengguna bisa masuk dengan email, dan dompet Web3 dibuatkan otomatis.</p></div>
+                    </div>
+                </div>
+            </section>
+            <section class="bg-slate-900 text-white py-20">
+                 <div class="container mx-auto px-6 text-center">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Siap Memberi Jiwa pada Produk Anda?</h2>
+                    <p class="text-lg text-slate-300 max-w-2xl mx-auto mb-8">Jadilah bagian dari revolusi transparansi produk. Lindungi brand Anda dan berikan kepercayaan penuh kepada konsumen.</p>
+                    <button onclick="showPage('login-page')" class="bg-white text-slate-900 font-bold px-8 py-4 rounded-lg hover:bg-slate-200 transition-colors inline-block text-lg">Mulai Sekarang, Gratis</button>
+                </div>
+            </section>
+        </main>
+        <footer class="bg-slate-100 border-t border-slate-200 py-12">
+            <div class="container mx-auto px-6 text-center text-slate-500">
+                 <!-- PERUBAHAN: Copyright dan OJK ditambahkan -->
+                 <p>&copy; 2025 AsalUsul. Semua Hak Cipta Dilindungi. | Data diawasi oleh OJK.</p>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- ======================= -->
+    <!--     KREATOR DASHBOARD     -->
+    <!-- ======================= -->
+    <div id="dashboard-container" class="page-container hidden">
+        <div id="login-page" class="min-h-screen flex items-center justify-center bg-gray-100">
+            <div class="bg-white p-8 md:p-12 rounded-2xl shadow-xl w-full max-w-md">
+                <!-- PERUBAHAN: Nama Aplikasi diubah -->
+                <h1 class="text-3xl font-bold text-slate-900 text-center cursor-pointer" onclick="showPage('landing-page-container')">Asal<span class="brand-green">Usul</span></h1>
+                <p class="text-center text-slate-500 mt-2 mb-8">Masuk ke Dasbor Kreator</p>
+                <form onsubmit="event.preventDefault(); showPage('dashboard-page');">
+                    <div class="mb-4"><label for="email" class="block text-sm font-medium text-slate-700 mb-1">Email</label><input type="email" id="email" value="kreator@contoh.com" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-green-500 focus:border-green-500" required></div>
+                    <div class="mb-6"><label for="password" class="block text-sm font-medium text-slate-700 mb-1">Password</label><input type="password" id="password" value="123456" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-green-500 focus:border-green-500" required></div>
+                    <button type="submit" class="w-full bg-slate-900 text-white font-semibold py-3 rounded-lg hover:bg-slate-700 transition-colors">Masuk</button>
+                    <button type="button" onclick="showPage('landing-page-container')" class="w-full text-center mt-4 text-sm text-slate-600 hover:underline">Kembali ke Halaman Utama</button>
+                </form>
+            </div>
+        </div>
+        <div id="dashboard-page" class="hidden">
+            <header class="bg-white border-b border-slate-200">
+                <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                    <!-- PERUBAHAN: Nama Aplikasi diubah -->
+                    <h1 class="text-2xl font-bold text-slate-900 cursor-pointer" onclick="showPage('landing-page-container')">Asal<span class="brand-green">Usul</span></h1>
+                    <button onclick="showPage('login-page')" class="text-sm font-semibold text-slate-600 hover:text-slate-900">Keluar</button>
+                </div>
+            </header>
+            <main class="container mx-auto px-6 py-10">
+                <!-- BAGIAN GRAFIK BARU -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">Grafik Penjualan (7 Hari Terakhir)</h3>
+                    <div style="height: 300px;">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-bold text-slate-900">Dasbor Produk Anda</h2>
+                    <button onclick="showPage('add-product-page')" class="bg-slate-900 text-white font-semibold px-6 py-3 rounded-lg hover:bg-slate-700 transition-colors flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> 
+                        Tambah Produk Baru
+                    </button>
+                </div>
+                <!-- TABEL PRODUK YANG DIPERBARUI -->
+                <div class="bg-white rounded-2xl shadow-lg overflow-x-auto">
+                    <table class="w-full text-left min-w-[768px]">
+                        <thead class="bg-slate-50 border-b border-slate-200">
+                            <tr>
+                                <th class="p-4 font-semibold text-sm w-20">Foto</th>
+                                <th class="p-4 font-semibold text-sm">Nama Produk</th>
+                                <th class="p-4 font-semibold text-sm">Tanggal Didaftarkan</th>
+                                <th class="p-4 font-semibold text-sm">Stok</th>
+                                <th class="p-4 font-semibold text-sm">Terjual</th>
+                                <th class="p-4 font-semibold text-sm">Status</th>
+                                <th class="p-4 font-semibold text-sm">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200">
+                            <!-- Contoh Produk 1 -->
+                            <tr>
+                                <td class="p-4"><img src="https://placehold.co/64x64/111827/FFF?text=Sepatu" alt="Sepatu Nusantara" class="rounded-md w-12 h-12 object-cover"></td>
+                                <td class="p-4 font-medium">Sepatu "Nusantara"</td>
+                                <td class="p-4 text-slate-500">10 Okt 2025</td>
+                                <td class="p-4 text-slate-500">50</td>
+                                <td class="p-4 text-slate-500">120</td>
+                                <td class="p-4"><span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full">Aktif</span></td>
+                                <td class="p-4"><a href="#" class="font-medium text-green-600 hover:text-green-800">Lihat</a></td>
+                            </tr>
+                            <!-- Contoh Produk 2 -->
+                            <tr>
+                                <td class="p-4"><img src="https://placehold.co/64x64/4a044e/FFF?text=Tas" alt="Tas Kulit Senja" class="rounded-md w-12 h-12 object-cover"></td>
+                                <td class="p-4 font-medium">Tas Kulit "Senja"</td>
+                                <td class="p-4 text-slate-500">5 Sep 2025</td>
+                                <td class="p-4 text-slate-500">25</td>
+                                <td class="p-4 text-slate-500">80</td>
+                                <td class="p-4"><span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full">Aktif</span></td>
+                                <td class="p-4"><a href="#" class="font-medium text-green-600 hover:text-green-800">Lihat</a></td>
+                            </tr>
+                            <!-- Contoh Produk 3 -->
+                            <tr>
+                                <td class="p-4"><img src="https://placehold.co/64x64/7f1d1d/FFF?text=Dompet" alt="Dompet Fajar" class="rounded-md w-12 h-12 object-cover"></td>
+                                <td class="p-4 font-medium">Dompet Kulit "Fajar"</td>
+                                <td class="p-4 text-slate-500">1 Agu 2025</td>
+                                <td class="p-4 text-slate-500">0</td>
+                                <td class="p-4 text-slate-500">150</td>
+                                <td class="p-4"><span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-1 rounded-full">Stok Habis</span></td>
+                                <td class="p-4"><a href="#" class="font-medium text-green-600 hover:text-green-800">Lihat</a></td>
+                            </tr>
+                            <!-- Contoh Produk 4 -->
+                            <tr>
+                                <td class="p-4"><img src="https://placehold.co/64x64/0c4a6e/FFF?text=Karya" alt="Karya Seni Mentari" class="rounded-md w-12 h-12 object-cover"></td>
+                                <td class="p-4 font-medium">Karya Seni "Mentari"</td>
+                                <td class="p-4 text-slate-500">15 Jul 2025</td>
+                                <td class="p-4 text-slate-500">1</td>
+                                <td class="p-4 text-slate-500">0</td>
+                                <td class="p-4"><span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full">Aktif</span></td>
+                                <td class="p-4"><a href="#" class="font-medium text-green-600 hover:text-green-800">Lihat</a></td>
+                            </tr>
+                            <!-- Contoh Produk 5 -->
+                            <tr>
+                                <td class="p-4"><img src="https://placehold.co/64x64/365314/FFF?text=Jaket" alt="Jaket Denim Atlas" class="rounded-md w-12 h-12 object-cover"></td>
+                                <td class="p-4 font-medium">Jaket Denim "Atlas"</td>
+                                <td class="p-4 text-slate-500">1 Jun 2025</td>
+                                <td class="p-4 text-slate-500">75</td>
+                                <td class="p-4 text-slate-500">210</td>
+                                <td class="p-4"><span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full">Aktif</span></td>
+                                <td class="p-4"><a href="#" class="font-medium text-green-600 hover:text-green-800">Lihat</a></td>
+                            </tr>
+                             <!-- Contoh Produk 6 -->
+                            <tr>
+                                <td class="p-4"><img src="https://placehold.co/64x64/701a75/FFF?text=Gelang" alt="Gelang Etnik" class="rounded-md w-12 h-12 object-cover"></td>
+                                <td class="p-4 font-medium">Gelang Etnik "Akar"</td>
+                                <td class="p-4 text-slate-500">20 Mei 2025</td>
+                                <td class="p-4 text-slate-500">150</td>
+                                <td class="p-4 text-slate-500">300</td>
+                                <td class="p-4"><span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full">Aktif</span></td>
+                                <td class="p-4"><a href="#" class="font-medium text-green-600 hover:text-green-800">Lihat</a></td>
+                            </tr>
+                            <!-- Contoh Produk 7 -->
+                            <tr>
+                                <td class="p-4"><img src="https://placehold.co/64x64/312e81/FFF?text=Lilin" alt="Lilin Aroma" class="rounded-md w-12 h-12 object-cover"></td>
+                                <td class="p-4 font-medium">Lilin Aroma "Hutan"</td>
+                                <td class="p-4 text-slate-500">1 Apr 2025</td>
+                                <td class="p-4 text-slate-500">40</td>
+                                <td class="p-4 text-slate-500">95</td>
+                                <td class="p-4"><span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full">Aktif</span></td>
+                                <td class="p-4"><a href="#" class="font-medium text-green-600 hover:text-green-800">Lihat</a></td>
+                            </tr>
+                            <!-- Contoh Produk 8 -->
+                            <tr>
+                                <td class="p-4"><img src="https://placehold.co/64x64/166534/FFF?text=Kopi" alt="Kopi Gayo" class="rounded-md w-12 h-12 object-cover"></td>
+                                <td class="p-4 font-medium">Kopi "Gayo" Edisi Spesial</td>
+                                <td class="p-4 text-slate-500">10 Mar 2025</td>
+                                <td class="p-4 text-slate-500">0</td>
+                                <td class="p-4 text-slate-500">500</td>
+                                <td class="p-4"><span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-1 rounded-full">Stok Habis</span></td>
+                                <td class="p-4"><a href="#" class="font-medium text-green-600 hover:text-green-800">Lihat</a></td>
+                            </tr>
+                            <!-- Contoh Produk 9 -->
+                            <tr>
+                                <td class="p-4"><img src="https://placehold.co/64x64/7c2d12/FFF?text=Patung" alt="Patung Kayu" class="rounded-md w-12 h-12 object-cover"></td>
+                                <td class="p-4 font-medium">Patung Kayu "Jati"</td>
+                                <td class="p-4 text-slate-500">5 Feb 2025</td>
+                                <td class="p-4 text-slate-500">5</td>
+                                <td class="p-4 text-slate-500">2</td>
+                                <td class="p-4"><span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full">Aktif</span></td>
+                                <td class="p-4"><a href="#" class="font-medium text-green-600 hover:text-green-800">Lihat</a></td>
+                            </tr>
+                            <!-- Contoh Produk 10 -->
+                            <tr>
+                                <td class="p-4"><img src="https://placehold.co/64x64/1f2937/FFF?text=Buku" alt="Buku Catatan" class="rounded-md w-12 h-12 object-cover"></td>
+                                <td class="p-4 font-medium">Buku Catatan "Legacy"</td>
+                                <td class="p-4 text-slate-500">1 Jan 2025</td>
+                                <td class="p-4 text-slate-500">200</td>
+                                <td class="p-4 text-slate-500">450</td>
+                                <td class="p-4"><span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full">Aktif</span></td>
+                                <td class="p-4"><a href="#" class="font-medium text-green-600 hover:text-green-800">Lihat</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+        <div id="add-product-page" class="hidden">
+            <header class="bg-white border-b border-slate-200">
+                 <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                    <!-- PERUBAHAN: Nama Aplikasi diubah -->
+                    <h1 class="text-2xl font-bold text-slate-900 cursor-pointer" onclick="showPage('landing-page-container')">Asal<span class="brand-green">Usul</span></h1>
+                    <button onclick="showPage('dashboard-page')" class="text-sm font-semibold text-slate-600 hover:text-slate-900">&larr; Kembali ke Dasbor</button>
+                </div>
+            </header>
+            <main class="container mx-auto px-6 py-10"><div class="max-w-3xl mx-auto"><h2 class="text-3xl font-bold text-slate-900 mb-2">Daftarkan Produk Baru</h2><p class="text-slate-500 mb-8">Isi detail di bawah ini untuk membuat Segel Digital yang unik bagi produk Anda.</p><form id="product-form" class="bg-white p-8 rounded-2xl shadow-lg space-y-6"><div><label for="product-name" class="block text-sm font-medium text-slate-700 mb-1">Nama Produk</label><input type="text" id="product-name" placeholder="Contoh: Sepatu Kulit 'Nusantara' Edisi Terbatas" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-green-500 focus:border-green-500" required></div>
+                
+                <!-- PERUBAHAN: Menambahkan tombol "Buat Cerita (AI)" -->
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label for="product-story" class="block text-sm font-medium text-slate-700">Deskripsi / Cerita Produk</label>
+                        <button type="button" id="generate-story-btn" class="flex items-center gap-1 text-xs brand-green font-semibold py-1 px-3 rounded-full border border-green-200 bg-green-50 hover:bg-green-100 transition-colors">
+                            ✨ Buat Cerita (AI)
+                        </button>
+                    </div>
+                    <textarea id="product-story" rows="4" placeholder="Ceritakan filosofi, inspirasi, atau keunikan produk Anda. Atau, biarkan AI kami membantu Anda..." class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-green-500 focus:border-green-500" required></textarea>
+                    <p id="story-error" class="text-red-500 text-xs mt-1 hidden">Harap isi Nama Produk dan Material terlebih dahulu.</p>
+                </div>
+                <!-- AKHIR PERUBAHAN -->
+                
+                <div><label for="product-material" class="block text-sm font-medium text-slate-700 mb-1">Material yang Digunakan</label><input type="text" id="product-material" placeholder="Contoh: Kulit Sapi Lokal, Benang Nilon, Sol Karet" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-green-500 focus:border-green-500" required></div><div><label for="product-artisan" class="block text-sm font-medium text-slate-700 mb-1">Nama Pengrajin</label><input type="text" id="product-artisan" placeholder="Contoh: Bp. Adi Santoso" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-green-500 focus:border-green-500" required></div><div><label class="block text-sm font-medium text-slate-700 mb-1">Foto / Video Produk</label><label for="product-media" class="file-input-label"><svg class="mx-auto h-12 w-12 text-slate-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true"><path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="mt-2 block text-sm text-slate-600">Klik untuk mengunggah</span><input id="product-media" name="product-media" type="file" class="sr-only"></label></div><div class="pt-4"><button type="submit" class="w-full bg-slate-900 text-white font-semibold py-3 rounded-lg hover:bg-slate-700 transition-colors text-lg">Buat Segel Digital & NFT</button></div></form></div></main>
+        </div>
+        <div id="success-page" class="hidden min-h-screen flex items-center justify-center bg-gray-100">
+            <div class="bg-white p-8 md:p-12 rounded-2xl shadow-xl w-full max-w-2xl text-center">
+                <div class="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"><svg class="text-green-600 w-12 h-12" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                <h2 class="text-3xl font-bold text-slate-900">Segel Digital Berhasil Dibuat!</h2>
+                <p class="text-slate-500 mt-2 mb-8">Segel ini sekarang terhubung ke NFT unik di blockchain untuk produk <strong id="success-product-name" class="text-slate-800"></strong>.</p>
+                <div class="border border-slate-200 bg-slate-50 rounded-lg p-6 mb-8"><p class="font-semibold mb-4">Cetak dan tempelkan QR Code ini pada produk Anda:</p><img id="qr-code-img" src="https://placehold.co/256x256/000000/FFFFFF?text=QR+CODE" alt="QR Code Produk" class="mx-auto rounded-lg shadow-md"></div>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center"><button class="bg-slate-900 text-white font-semibold px-6 py-3 rounded-lg hover:bg-slate-700 transition-colors">Unduh QR Code</button><button onclick="showPage('add-product-page')" class="bg-white text-slate-900 font-semibold px-6 py-3 rounded-lg border border-slate-300 hover:bg-slate-100 transition-colors">Daftarkan Produk Lain</button></div>
+                 <button onclick="showPage('dashboard-page')" class="mt-6 text-sm font-semibold text-slate-600 hover:text-slate-900">&larr; Kembali ke Dasbor</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =================================== -->
+    <!--     LOGISTICS / TOKO DASHBOARD      -->
+    <!-- =================================== -->
+    <div id="logistics-container" class="page-container hidden">
+        <div id="logistics-scan-page" class="min-h-screen bg-gray-100 py-10">
+            <header class="bg-white border-b border-slate-200 fixed top-0 left-0 right-0 z-10">
+                 <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                    <!-- PERUBAHAN: Nama Aplikasi diubah -->
+                    <h1 class="text-2xl font-bold text-slate-900 cursor-pointer" onclick="showPage('landing-page-container')">Asal<span class="brand-green">Usul</span></h1>
+                    <span class="font-semibold text-slate-700">Mode: Pindai Logistik/Toko</span>
+                </div>
+            </header>
+            <main class="container mx-auto px-6 pt-24">
+                <div class="max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-lg">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-2 text-center">Pindai Segel Digital</h2>
+                    <p class="text-slate-500 mb-6 text-center">Arahkan kamera ke QR code pada produk.</p>
+                    
+                    <!-- Simulasi Pemandangan Kamera -->
+                    <div class="scanner-view">
+                        <div class="scanner-line"></div>
+                        <p class="text-white text-center absolute bottom-4 left-0 right-0 text-sm opacity-70">Menunggu pemindaian...</p>
+                    </div>
+
+                    <!--
+                        Dalam aplikasi nyata, pemindaian QR akan otomatis mengisi data.
+                        Di sini, kita simulasikan bahwa pemindaian berhasil untuk "Sepatu Nusantara".
+                    -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 my-6">
+                        <p class="text-sm text-slate-600">Produk Terdeteksi:</p>
+                        <h3 class="text-xl font-semibold text-slate-800">Sepatu "Nusantara"</h3>
+                        <p class="text-sm text-slate-500">ID: <span class="font-mono">prod_123456789</span></p>
+                    </div>
+
+                    <form id="logistics-form" class="space-y-4">
+                        <div>
+                            <label for="logistics-status" class="block text-sm font-medium text-slate-700 mb-1">Status Baru</label>
+                            <select id="logistics-status" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-green-500 focus:border-green-500" required>
+                                <option value="Diterima di Gudang">Diterima di Gudang</option>
+                                <option value="Dalam Pengiriman ke Toko">Dalam Pengiriman ke Toko</option>
+                                <option value="Stok Diterima Toko">Stok Diterima Toko</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="logistics-location" class="block text-sm font-medium text-slate-700 mb-1">Lokasi Saat Ini</label>
+                            <input type="text" id="logistics-location" placeholder="Contoh: Pusat Distribusi, Surabaya" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-green-500 focus:border-green-500" required>
+                        </div>
+                        <div class="pt-4">
+                            <button type="submit" class="w-full bg-green-600 text-white font-semibold py-3 rounded-lg hover:bg-green-500 transition-colors text-lg">Update Perjalanan Produk</Gbutton>
+                        </div>
+                         <button type="button" onclick="showPage('landing-page-container')" class="w-full text-center mt-4 text-sm text-slate-600 hover:underline">Batal dan Kembali</button>
+                    </form>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- ======================= -->
+    <!--     KONSUMEN DASHBOARD    -->
+    <!-- ======================= -->
+    <div id="consumer-container" class="page-container hidden">
+        <!-- Halaman Login Konsumen -->
+        <div id="consumer-login-page" class="min-h-screen flex items-center justify-center bg-gray-100">
+            <div class="bg-white p-8 md:p-12 rounded-2xl shadow-xl w-full max-w-md">
+                <!-- PERUBAHAN: Nama Aplikasi diubah -->
+                <h1 class="text-3xl font-bold text-slate-900 text-center cursor-pointer" onclick="showPage('landing-page-container')">Asal<span class="brand-green">Usul</span></h1>
+                <p class="text-center text-slate-500 mt-2 mb-8">Masuk ke Akun Konsumen Anda</p>
+                <form onsubmit="event.preventDefault(); showPage('consumer-dashboard-page');">
+                    <div class="mb-4"><label for="consumer-email" class="block text-sm font-medium text-slate-700 mb-1">Email</label><input type="email" id="consumer-email" value="konsumen@gmail.com" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-green-500 focus:border-green-500" required></div>
+                    <div class="mb-6"><label for="consumer-password" class="block text-sm font-medium text-slate-700 mb-1">Password</label><input type="password" id="consumer-password" value="123456" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-green-500 focus:border-green-500" required></div>
+                    <button type="submit" class="w-full brand-green-bg text-white font-semibold py-3 rounded-lg hover:bg-green-700 transition-colors">Masuk</button>
+                    <button type="button" onclick="showPage('landing-page-container')" class="w-full text-center mt-4 text-sm text-slate-600 hover:underline">Kembali ke Halaman Utama</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Halaman Dasbor Konsumen -->
+        <div id="consumer-dashboard-page" class="hidden">
+            <header class="bg-white border-b border-slate-200">
+                <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                    <!-- PERUBAHAN: Nama Aplikasi diubah -->
+                    <h1 class="text-2xl font-bold text-slate-900 cursor-pointer" onclick="showPage('landing-page-container')">Asal<span class="brand-green">Usul</span></h1>
+                    <button onclick="showPage('consumer-login-page')" class="text-sm font-semibold text-slate-600 hover:text-slate-900">Keluar</button>
+                </div>
+            </header>
+            <main class="container mx-auto px-6 py-10">
+                <h2 class="text-3xl font-bold text-slate-900 mb-8">Profil Saya</h2>
+                
+                <!-- Bagian Profil -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+                    <div class="md:grid md:grid-cols-3 gap-8">
+                        <!-- Kolom Kiri: Foto & Bio -->
+                        <div class="md:col-span-1 text-center md:text-left">
+                            <img src="https://placehold.co/160x160/e0f2fe/0c4a6e?text=Profil" alt="Foto Profil" class="w-40 h-40 rounded-full mx-auto md:mx-0 mb-4 border-4 border-white shadow-md">
+                            <h3 class="text-2xl font-bold text-slate-800">KonsumenSatu</h3>
+                            <p class="text-slate-500 mt-2">Pecinta produk lokal berkualitas dan transparan. </p>
+                        </div>
+                        
+                        <!-- Kolom Kanan: Detail Data Diri -->
+                        <div class="md:col-span-2 mt-8 md:mt-0">
+                            <h4 class="text-lg font-semibold text-slate-700 mb-4 border-b pb-2">Data Diri</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-500">Email</label>
+                                    <p class="text-base text-slate-800 font-medium">konsumen@gmail.com</p>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-500">Nomor Handphone</label>
+                                    <p class="text-base text-slate-800 font-medium">+62 812 3456 7890</p>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-500">Tanggal Lahir</label>
+                                    <p class="text-base text-slate-800 font-medium">15 Agustus 1995</p>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-500">Jenis Kelamin</label>
+                                    <p class="text-base text-slate-800 font-medium">Laki-laki</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bagian Riwayat Transaksi -->
+                <h2 class="text-3xl font-bold text-slate-900 mb-8">Riwayat Transaksi</h2>
+                <div class="bg-white rounded-2xl shadow-lg overflow-x-auto">
+                    <table class="w-full text-left min-w-[640px]">
+                        <thead class="bg-slate-50 border-b border-slate-200">
+                            <tr>
+                                <th class="p-4 font-semibold text-sm">Nama Produk</th>
+                                <th class="p-4 font-semibold text-sm">Tanggal Beli</th>
+                                <th class="p-4 font-semibold text-sm">Toko</th>
+                                <th class="p-4 font-semibold text-sm">Status Verifikasi</th>
+                                <th class="p-4 font-semibold text-sm">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200">
+                            <tr>
+                                <td class="p-4 font-medium">Sepatu "Nusantara"</td>
+                                <td class="p-4 text-slate-500">10 Okt 2025</td>
+                                <td class="p-4 text-slate-500">Toko Resmi, Medan</td>
+                                <td class="p-4"><span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full">Terverifikasi Asli</span></td>
+                                <td class="p-4"><a href="#contoh-paspor" onclick="showPage('landing-page-container'); setTimeout(() => window.location.hash = 'contoh-paspor', 10);" class="font-medium text-green-600 hover:text-green-800">Lihat Paspor</a></td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 font-medium">Tas Kulit "Senja"</td>
+                                <td class="p-4 text-slate-500">12 Sep 2025</td>
+                                <td class="p-4 text-slate-500">Pasar Lokal, Bali</td>
+                                <td class="p-4"><span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full">Terverifikasi Asli</span></td>
+                                <td class="p-4"><a href="#" class="font-medium text-green-600 hover:text-green-800">Lihat Paspor</a></td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 font-medium">Kopi "Gayo" Edisi Spesial</td>
+                                <td class="p-4 text-slate-500">15 Mar 2025</td>
+                                <td class="p-4 text-slate-500">Toko Kopi, Jakarta</td>
+                                <td class="p-4"><span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full">Terverifikasi Asli</span></td>
+                                <td class="p-4"><a href="#" class="font-medium text-green-600 hover:text-green-800">Lihat Paspor</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+
+        <!-- HALAMAN BARU: Pindai Konsumen -->
+        <div id="consumer-scan-page" class="hidden min-h-screen bg-gray-100 py-10">
+            <header class="bg-white border-b border-slate-200 fixed top-0 left-0 right-0 z-10">
+                 <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                    <!-- PERUBAHAN: Nama Aplikasi diubah -->
+                    <h1 class="text-2xl font-bold text-slate-900 cursor-pointer" onclick="showPage('landing-page-container')">Asal<span class="brand-green">Usul</span></h1>
+                    <span class="font-semibold text-green-700">Mode: Pindai Konsumen</span>
+                </div>
+            </header>
+            <main class="container mx-auto px-6 pt-24">
+                <div class="max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-lg">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-2 text-center">Verifikasi Keaslian</h2>
+                    <p class="text-slate-500 mb-6 text-center">Arahkan kamera ponsel Anda ke QR code pada produk untuk melihat riwayat lengkapnya.</p>
+                    
+                    <!-- Simulasi Pemandangan Kamera -->
+                    <div class="scanner-view">
+                        <div class="scanner-line"></div>
+                        <p class="text-white text-center absolute bottom-4 left-0 right-0 text-sm opacity-70">Mensimulasikan pemindaian...</p>
+                    </div>
+
+                    <!-- Simulasi Hasil Pindai -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 my-6">
+                        <p class="text-sm text-slate-600">Produk Terdeteksi:</p>
+                        <h3 class="text-xl font-semibold text-slate-800">Sepatu "Nusantara"</h3>
+                        <p class="text-sm text-slate-500">ID: <span class="font-mono">prod_123456789</span></p>
+                    </div>
+
+                    <div class="pt-4">
+                        <button onclick="showPage('landing-page-container'); setTimeout(() => window.location.hash = 'contoh-paspor', 10);" class="w-full brand-green-bg text-white font-semibold py-3 rounded-lg hover:bg-green-700 transition-colors text-lg">
+                            Lihat Paspor Digital
+                        </button>
+                    </div>
+                     <button type="button" onclick="showPage('landing-page-container')" class="w-full text-center mt-4 text-sm text-slate-600 hover:underline">Batal dan Kembali</button>
+                </div>
+            </main>
+        </div>
+    </div>
+
+
+    <script>
+        // === STATE SIMULATION ===
+        // Data perjalanan produk yang disimulasikan. Dalam aplikasi nyata, ini akan diambil dari database/blockchain.
+        let journeyData = [
+            { status: "Diciptakan", location: "Studio Kaki Langit, Bandung", date: "1 Oktober 2025" },
+            { status: "Dikirim oleh Logistik", location: "Gudang Pusat, Jakarta", date: "5 Oktober 2025" },
+            { status: "Tiba di Toko", location: "Toko Resmi, Medan", date: "10 Oktober 2025" }
+        ];
+
+        // Fungsi untuk me-render data perjalanan ke halaman "Contoh Paspor Digital"
+        function renderJourney() {
+            const timelineContainer = document.getElementById('journey-timeline');
+            if (!timelineContainer) return;
+            
+            timelineContainer.innerHTML = ''; // Kosongkan data yang ada
+            
+            if (journeyData.length === 0) {
+                 timelineContainer.innerHTML = '<p class="text-slate-500">Belum ada data perjalanan.</p>';
+                 return;
+            }
+            
+            journeyData.forEach(item => {
+                const itemHtml = `
+                <div class="timeline-item mb-6 relative">
+                    <h6 class="font-semibold">${item.status}</h6>
+                    <p class="text-sm text-slate-500">${item.location}</p>
+                    <p class="text-xs text-slate-400">${item.date}</p>
+                </div>
+                `;
+                timelineContainer.innerHTML += itemHtml;
+            });
+        }
+
+        // ========================
+
+        // Variabel global untuk menyimpan instance Chart
+        let salesChartInstance = null;
+
+        // Fungsi untuk menginisialisasi atau memperbarui grafik penjualan
+        function initSalesChart() {
+            const ctx = document.getElementById('salesChart');
+            if (!ctx) return; // Keluar jika canvas tidak ditemukan
+
+            // Data dummy untuk grafik
+            const data = {
+                labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
+                datasets: [{
+                    label: 'Produk Terjual',
+                    data: [12, 19, 3, 5, 2, 3, 9], // Data penjualan dummy
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    borderColor: 'rgba(34, 197, 94, 1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
+                }]
+            };
+
+            // Hancurkan instance chart sebelumnya jika ada
+            if (salesChartInstance) {
+                salesChartInstance.destroy();
+            }
+
+            // Buat chart baru
+            salesChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index',
+                    }
+                }
+            });
+        }
+
+
+        // ===================================
+        // FUNGSI BARU: PANGGILAN GEMINI API
+        // ===================================
+        /**
+         * Memanggil Gemini API untuk membuat cerita produk berdasarkan input.
+         * @param {string} productName - Nama produk.
+         * @param {string} productMaterial - Material yang digunakan.
+         * @returns {Promise<string>} Teks cerita yang dihasilkan.
+         */
+        async function callGeminiApi(productName, productMaterial) {
+            const apiKey = ""; // Kunci API akan otomatis disediakan oleh lingkungan
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+            // Sistem prompt untuk mengatur nada dan persona AI
+            const systemPrompt = "Anda adalah seorang copywriter brand mewah yang ahli dalam storytelling untuk produk-produk buatan tangan (artisan). Ciptakan cerita yang puitis, otentik, premium, dan menonjolkan nilai keahlian.";
+            
+            // User query yang spesifik
+            const userQuery = `Tuliskan cerita produk (deskripsi) yang menarik dalam 1-2 paragraf singkat untuk sebuah produk.
+            Gunakan Bahasa: Indonesia.
+
+            Detail Produk:
+            - Nama Produk: ${productName}
+            - Material Utama: ${productMaterial}
+            
+            Mulai langsung dengan ceritanya, tanpa pengantar.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+                // Tidak perlu 'tools' (Google Search) untuk tugas kreatif ini
+            };
+
+            try {
+                // Dalam aplikasi produksi, terapkan strategi exponential backoff untuk retry
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                // Ekstrak teks dari respons
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    return result.candidates[0].content.parts[0].text;
+                } else {
+                    // Handle jika struktur respons tidak valid
+                    console.error("Respon API tidak valid:", result);
+                    return "Maaf, terjadi kesalahan saat membuat cerita. Silakan coba lagi.";
+                }
+
+            } catch (error) {
+                console.error("Error memanggil Gemini API:", error);
+                // Dalam produksi, berikan pesan yang lebih ramah pengguna
+                return `Terjadi kesalahan jaringan: ${error.message}. Periksa koneksi Anda dan coba lagi.`;
+            }
+        }
+        // ========================
+
+
+        // Store current active page and sub-page
+        let currentPageId = 'landing-page-container';
+        let currentSubPageId = 'login-page';
+
+        function showPage(pageId, subPageId = null) {
+            // Sembunyikan semua page container utama
+            document.getElementById('landing-page-container').classList.add('hidden');
+            document.getElementById('dashboard-container').classList.add('hidden');
+            document.getElementById('logistics-container').classList.add('hidden');
+            document.getElementById('consumer-container').classList.add('hidden');
+            
+            let container;
+            if (pageId.startsWith('consumer-') || pageId.startsWith('logistics-')) {
+                 if (pageId.startsWith('consumer-')) {
+                    container = document.getElementById('consumer-container');
+                 } else {
+                    container = document.getElementById('logistics-container');
+                 }
+            } else if (['login-page', 'dashboard-page', 'add-product-page', 'success-page'].includes(pageId)) {
+                container = document.getElementById('dashboard-container');
+                currentSubPageId = pageId;
+            } else {
+                container = document.getElementById(pageId); // 'landing-page-container'
+                currentPageId = pageId;
+            }
+
+            if (container) {
+                container.classList.remove('hidden');
+                container.classList.add('page-container');
+            }
+            
+            // Handle sub-pages (di dalam dashboard container)
+            if (container === document.getElementById('dashboard-container')) {
+                document.getElementById('login-page').classList.add('hidden');
+                document.getElementById('dashboard-page').classList.add('hidden');
+                document.getElementById('add-product-page').classList.add('hidden');
+                document.getElementById('success-page').classList.add('hidden');
+                
+                const subPage = document.getElementById(currentSubPageId);
+                if (subPage) subPage.classList.remove('hidden');
+
+                // Jika kita beralih ke halaman dasbor, inisialisasi chart
+                if (currentSubPageId === 'dashboard-page') {
+                    initSalesChart();
+                }
+            }
+            
+             // Handle sub-pages (di dalam consumer container)
+            if (container === document.getElementById('consumer-container')) {
+                document.getElementById('consumer-login-page').classList.add('hidden');
+                document.getElementById('consumer-dashboard-page').classList.add('hidden');
+                document.getElementById('consumer-scan-page').classList.add('hidden');
+                
+                const subPage = document.getElementById(pageId); // 'consumer-login-page' atau 'consumer-dashboard-page' atau 'consumer-scan-page'
+                if (subPage) {
+                    subPage.classList.remove('hidden');
+                } else {
+                    // Default ke login jika ID tidak valid
+                    document.getElementById('consumer-login-page').classList.remove('hidden');
+                }
+            }
+
+            // Handle sub-pages (di dalam logistics container)
+            if (container === document.getElementById('logistics-container')) {
+                 document.getElementById('logistics-scan-page').classList.remove('hidden');
+                 // Di masa depan, jika ada halaman login logistik, bisa ditambahkan di sini
+            }
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        // === EVENT LISTENERS ===
+        
+        // Dijalankan setelah semua HTML dimuat
+        // PERBAIKAN: Menggabungkan semua listener DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Handle the product form submission
+            const productForm = document.getElementById('product-form');
+            if (productForm) {
+                productForm.addEventListener('submit', function(event) {
+                    event.preventDefault(); // Mencegah form submit
+                    const productName = document.getElementById('product-name').value;
+                    document.getElementById('success-product-name').innerText = productName;
+                    showPage('success-page');
+                });
+            }
+
+            // Handle the logistics form submission
+            const logisticsForm = document.getElementById('logistics-form');
+            if (logisticsForm) {
+                logisticsForm.addEventListener('submit', function(event) {
+                    event.preventDefault(); // Mencegah form submit
+                    
+                    // Ambil data dari form
+                    const status = document.getElementById('logistics-status').value;
+                    const location = document.getElementById('logistics-location').value;
+                    const date = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+                    
+                    // Tambahkan ke data simulasi
+                    journeyData.push({ status, location, date });
+                    
+                    // Beri tahu pengguna
+                    alert('Data perjalanan berhasil diperbarui!');
+                    
+                    // Kembali ke halaman utama dan render ulang timeline
+                    showPage('landing-page-container');
+                    renderJourney();
+                    
+                    // Scroll ke bagian paspor
+                    setTimeout(() => {
+                         window.location.hash = 'contoh-paspor'; // Set hash baru untuk scroll
+                    }, 100);
+                });
+            }
+
+            // Scroll to hash logic (jika ada)
+            if (window.location.hash && document.querySelector(window.location.hash)) {
+                document.querySelector(window.location.hash).scrollIntoView({ behavior: 'smooth' });
+            }
+
+            // Tampilkan halaman utama
+            showPage('landing-page-container');
+            // Render data perjalanan saat halaman pertama kali dimuat
+            renderJourney();
+
+            // === EVENT LISTENER BARU: Tombol Generate Cerita (AI) ===
+            const generateStoryBtn = document.getElementById('generate-story-btn');
+            const storyTextarea = document.getElementById('product-story');
+            const productNameInput = document.getElementById('product-name');
+            const materialInput = document.getElementById('product-material');
+            const storyError = document.getElementById('story-error');
+
+            if (generateStoryBtn) {
+                generateStoryBtn.addEventListener('click', async () => {
+                    const productName = productNameInput.value;
+                    const productMaterial = materialInput.value;
+
+                    // Validasi: Pastikan input tidak kosong
+                    if (!productName.trim() || !productMaterial.trim()) {
+                        storyError.textContent = "Harap isi Nama Produk dan Material terlebih dahulu.";
+                        storyError.classList.remove('hidden');
+                        return;
+                    }
+                    
+                    // Sembunyikan pesan error jika valid
+                    storyError.classList.add('hidden');
+                    
+                    // Set status loading pada tombol
+                    const originalBtnText = generateStoryBtn.innerHTML;
+                    generateStoryBtn.disabled = true;
+                    generateStoryBtn.innerHTML = `
+                        <svg class="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Membuat cerita...
+                    `;
+
+                    // Panggil Gemini API
+                    const generatedStory = await callGeminiApi(productName, productMaterial);
+                    
+                    // Tampilkan hasil di textarea
+                    storyTextarea.value = generatedStory;
+                    
+                    // Kembalikan tombol ke status normal
+                    generateStoryBtn.disabled = false;
+                    generateStoryBtn.innerHTML = originalBtnText;
+                });
+            }
+            // === AKHIR EVENT LISTENER BARU ===
+        });
+    </script>
+</body>
+</html>
+
